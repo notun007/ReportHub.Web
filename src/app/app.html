@@ -1,0 +1,55 @@
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Primary navigation">
+    <div class="brand"><span>Report</span><strong>Hub</strong><small>Southeast Bank PLC</small></div>
+    <nav>
+      <section>
+        <h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h5"/></svg>Reports</h2>
+        <a class="active" href="#results"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7zM15 3v5h4M10 12h6M10 16h6"/></svg>Account Collection Report</a>
+        <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v18H7zM10 8h4M10 12h4M10 16h4"/></svg>Account Statement</a>
+        <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v18H7zM10 8h4M10 12h4M10 16h4"/></svg>Deposit Report</a>
+      </section>
+      <section><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 13v8h14v-8"/></svg>Exports</h2><a href="#">Export History</a></section>
+      <section><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Configuration</h2><a href="#">Report Definitions</a><a href="#">Data Sources</a></section>
+      <section><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8M17 11l2 2 4-4"/></svg>Administration</h2><a href="#">Users &amp; Permissions</a></section>
+    </nav>
+    <div class="sidebar-footer"><strong>Southeast Bank PLC</strong><span>ReportHub v0.1.0</span></div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <button class="menu-button" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+      <h1>Account Collection Report</h1>
+      <div class="profile"><span class="avatar">RA</span><span><strong>Rahim Ahmed</strong><small>Report User</small></span></div>
+    </header>
+
+    <main>
+      <section class="panel criteria-panel" aria-labelledby="criteria-heading">
+        <div class="panel-heading"><h2 id="criteria-heading">Report Criteria</h2></div>
+        <form [formGroup]="criteria" (ngSubmit)="runReport()">
+          <label><span>From Date <em>*</em></span><p-datepicker formControlName="fromDate" dateFormat="dd/mm/yy" [showIcon]="true" [fluid]="true" /></label>
+          <label><span>To Date <em>*</em></span><p-datepicker formControlName="toDate" dateFormat="dd/mm/yy" [showIcon]="true" [fluid]="true" /></label>
+          <label><span>Branch</span><p-select formControlName="branch" [options]="branches" optionLabel="label" optionValue="value" [fluid]="true" /></label>
+          <label><span>Status</span><p-select formControlName="status" [options]="statuses" optionLabel="label" optionValue="value" [fluid]="true" /></label>
+          <div class="actions">
+            <p-button type="submit" label="View report" [loading]="isRunning()" />
+            <p-button type="button" label="Reset" severity="secondary" [outlined]="true" (onClick)="reset()" />
+          </div>
+          @if (criteria.controls.toDate.hasError('dateRange')) { <p class="validation">To Date must be on or after From Date.</p> }
+        </form>
+      </section>
+
+      <section class="panel results-panel" id="results" aria-labelledby="results-heading">
+        <div class="results-heading">
+          <div><h2 id="results-heading">Report Results</h2><p><strong>{{ rows().length }} rows shown</strong><span>·</span> Preview capped at 250 rows</p></div>
+          <div class="results-actions"><span>Generated {{ lastGeneratedAt() | date: 'dd MMM y, h:mm a' }}</span><p-button label="Export" severity="secondary" [outlined]="true" /></div>
+        </div>
+        <p-table [value]="rows()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" sortField="collectionDate" [sortOrder]="-1" [tableStyle]="{ 'min-width': '70rem' }">
+          <ng-template #header><tr><th pSortableColumn="accountNumber">Account No.<p-sort-icon field="accountNumber" /></th><th pSortableColumn="customerName">Customer Name<p-sort-icon field="customerName" /></th><th pSortableColumn="branch">Branch<p-sort-icon field="branch" /></th><th pSortableColumn="collectionDate">Collection Date<p-sort-icon field="collectionDate" /></th><th pSortableColumn="amount" class="number">Amount (BDT)<p-sort-icon field="amount" /></th><th pSortableColumn="status">Status<p-sort-icon field="status" /></th></tr></ng-template>
+          <ng-template #body let-row><tr><td class="account">{{ row.accountNumber }}</td><td>{{ row.customerName }}</td><td>{{ row.branch }}</td><td>{{ row.collectionDate | date: 'dd MMM y' }}</td><td class="number">{{ row.amount | number: '1.2-2' }}</td><td><p-tag [value]="row.status" [severity]="statusSeverity(row.status)" /></td></tr></ng-template>
+          <ng-template #emptymessage><tr><td colspan="6" class="empty">No collections match the selected criteria.</td></tr></ng-template>
+        </p-table>
+      </section>
+    </main>
+    <footer><span>© 2026 Southeast Bank PLC. Internal use only.</span><span><i></i> Preview data</span></footer>
+  </div>
+</div>
